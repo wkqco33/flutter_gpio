@@ -47,6 +47,10 @@ sudo usermod -a -G gpio $USER
 
 #### 3. 패키지 추가
 
+##### pub.dev에서 설치
+
+`pubspec.yaml`에 추가:
+
 ```yaml
 dependencies:
   flutter_gpio: ^0.1.0
@@ -56,6 +60,33 @@ dependencies:
 
 ```bash
 dart pub add flutter_gpio
+```
+
+##### 로컬에서 설치
+
+프로젝트를 클론하여 로컬 경로로 추가:
+
+```bash
+# 패키지 클론
+git clone https://github.com/wkqco33/flutter_gpio.git
+```
+
+`pubspec.yaml`에 로컬 경로 추가:
+
+```yaml
+dependencies:
+  flutter_gpio:
+    path: ../flutter_gpio  # 클론한 경로
+```
+
+또는 Git 저장소에서 직접:
+
+```yaml
+dependencies:
+  flutter_gpio:
+    git:
+      url: https://github.com/wkqco33/flutter_gpio.git
+      ref: main  # 또는 특정 브랜치/태그
 ```
 
 ## 사용법
