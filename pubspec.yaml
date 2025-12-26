@@ -3,10 +3,10 @@ description: |
   Complete Raspberry Pi GPIO control package with pull-up/down resistors, 
   interrupts, batch operations, and PWM. Direct libgpiod FFI bindings 
   for efficient hardware control.
-version: 1.0.0
-homepage: https://github.com/seomini/flutter_gpio
-repository: https://github.com/seomini/flutter_gpio
-issue_tracker: https://github.com/seomini/flutter_gpio/issues
+version: 0.1.0
+homepage: https://github.com/wkqco33/flutter_gpio
+repository: https://github.com/wkqco33/flutter_gpio
+issue_tracker: https://github.com/wkqco33/flutter_gpio/issues
 
 environment:
   sdk: ^3.10.4
