@@ -6,9 +6,7 @@ import '../exceptions.dart';
 import '../gpio_pull_mode.dart';
 import '../gpio_edge.dart';
 
-/// GPIO Chip을 나타내는 네이티브 헬퍼 클래스
-///
-/// libgpiod의 gpiod_chip을 래핑하여 Dart에서 사용하기 쉽게 만듭니다.
+/// libgpiod gpiod_chip 래퍼
 class GpioChipNative {
   final LibGpiodBindings _bindings;
   final GpiodChipPtr _chipPtr;
@@ -16,12 +14,7 @@ class GpioChipNative {
 
   GpioChipNative._(this._bindings, this._chipPtr);
 
-  /// GPIO 칩을 이름으로 엽니다.
-  ///
-  /// [chipName]: GPIO 칩 이름 (예: "gpiochip0")
-  ///
-  /// 반환: GpioChipNative 인스턴스
-  /// 예외: GpioInitializationException - 칩을 열 수 없는 경우
+  /// GPIO 칩 열기
   static GpioChipNative open(String chipName) {
     final bindings = LibGpiodBindings();
     final chipNamePtr = chipName.toNativeUtf8();
@@ -42,12 +35,7 @@ class GpioChipNative {
     }
   }
 
-  /// GPIO 라인을 가져옵니다.
-  ///
-  /// [offset]: GPIO 핀 번호 (BCM 번호)
-  ///
-  /// 반환: GpioLineNative 인스턴스
-  /// 예외: GpioOperationException - 라인을 가져올 수 없는 경우
+  /// GPIO 라인 가져오기
   GpioLineNative getLine(int offset) {
     _ensureNotClosed();
 
@@ -60,14 +48,14 @@ class GpioChipNative {
     return GpioLineNative._(_bindings, linePtr, offset);
   }
 
-  /// 칩이 닫혔는지 확인
+  /// 칩 닫힘 확인
   void _ensureNotClosed() {
     if (_isClosed) {
       throw GpioOperationException('GPIO 칩이 이미 닫혔습니다.');
     }
   }
 
-  /// GPIO 칩을 닫고 리소스를 해제합니다.
+  /// 칩 닫기
   void close() {
     if (!_isClosed) {
       _bindings.gpiodChipClose(_chipPtr);
@@ -75,13 +63,11 @@ class GpioChipNative {
     }
   }
 
-  /// 칩이 닫혔는지 확인
+  /// 닫힘 여부
   bool get isClosed => _isClosed;
 }
 
-/// GPIO Line을 나타내는 네이티브 헬퍼 클래스
-///
-/// libgpiod의 gpiod_line을 래핑하여 Dart에서 사용하기 쉽게 만듭니다.
+/// libgpiod gpiod_line 래퍼
 class GpioLineNative {
   final LibGpiodBindings _bindings;
   final GpiodLinePtr _linePtr;
@@ -89,12 +75,12 @@ class GpioLineNative {
   bool _isReleased = false;
   bool _isRequested = false;
 
-  /// 소비자 이름 (누가 이 GPIO를 사용하는지 식별)
+  /// 소비자 이름
   static const String _consumerName = 'flutter_gpio';
 
   GpioLineNative._(this._bindings, this._linePtr, this.offset);
 
-  /// Pull mode를 flags로 변환
+  /// Pull mode → flags 변환
   int _getPullModeFlags(GpioPullMode pullMode) {
     switch (pullMode) {
       case GpioPullMode.disabled:
@@ -106,11 +92,7 @@ class GpioLineNative {
     }
   }
 
-  /// GPIO 라인을 입력 모드로 요청합니다.
-  ///
-  /// [pullMode]: Pull 저항 모드 (기본값: disabled)
-  ///
-  /// 예외: GpioOperationException - 요청 실패 시
+  /// 입력 모드로 요청
   void requestInput({GpioPullMode pullMode = GpioPullMode.disabled}) {
     _ensureNotReleased();
 
@@ -140,11 +122,7 @@ class GpioLineNative {
     }
   }
 
-  /// GPIO 라인을 출력 모드로 요청합니다.
-  ///
-  /// [defaultValue]: 초기 값 (0 = LOW, 1 = HIGH)
-  ///
-  /// 예외: GpioOperationException - 요청 실패 시
+  /// 출력 모드로 요청
   void requestOutput({int defaultValue = 0}) {
     _ensureNotReleased();
 
@@ -173,10 +151,7 @@ class GpioLineNative {
     }
   }
 
-  /// GPIO 라인의 값을 읽습니다.
-  ///
-  /// 반환: 0 (LOW) 또는 1 (HIGH)
-  /// 예외: GpioOperationException - 읽기 실패 시
+  /// 값 읽기
   int getValue() {
     _ensureNotReleased();
     _ensureRequested();
@@ -190,11 +165,7 @@ class GpioLineNative {
     return value;
   }
 
-  /// GPIO 라인에 값을 씁니다.
-  ///
-  /// [value]: 0 (LOW) 또는 1 (HIGH)
-  ///
-  /// 예외: GpioOperationException - 쓰기 실패 시
+  /// 값 쓰기
   void setValue(int value) {
     _ensureNotReleased();
     _ensureRequested();
@@ -223,7 +194,7 @@ class GpioLineNative {
     }
   }
 
-  /// GPIO 라인을 해제합니다.
+  /// 라인 해제
   void release() {
     if (!_isReleased && _isRequested) {
       _bindings.gpiodLineRelease(_linePtr);
@@ -232,12 +203,7 @@ class GpioLineNative {
     }
   }
 
-  /// GPIO 라인을 이벤트 모니터링 모드로 요청합니다.
-  ///
-  /// [edge]: 모니터링할 엣지 타입
-  /// [pullMode]: Pull 저항 모드 (선택)
-  ///
-  /// 예외: GpioOperationException - 요청 실패 시
+  /// 이벤트 모니터링 모드로 요청
   void requestEvents(
     GpioEdge edge, {
     GpioPullMode pullMode = GpioPullMode.disabled,
@@ -283,12 +249,7 @@ class GpioLineNative {
     }
   }
 
-  /// 이벤트를 대기합니다.
-  ///
-  /// [timeout]: 대기 시간 (null이면 무한 대기)
-  ///
-  /// 반환: true - 이벤트 발생, false - 타임아웃
-  /// 예외: GpioOperationException - 대기 실패 시
+  /// 이벤트 대기
   bool waitForEvent({Duration? timeout}) {
     _ensureNotReleased();
     _ensureRequested();
@@ -303,10 +264,7 @@ class GpioLineNative {
     return result == 1; // 1 = event, 0 = timeout
   }
 
-  /// 이벤트를 읽습니다.
-  ///
-  /// 반환: GpioEdgeEvent
-  /// 예외: GpioOperationException - 읽기 실패 시
+  /// 이벤트 읽기
   GpioEdgeEvent readEvent() {
     _ensureNotReleased();
     _ensureRequested();

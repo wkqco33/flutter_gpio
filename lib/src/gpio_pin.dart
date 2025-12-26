@@ -7,40 +7,39 @@ import 'exceptions.dart';
 import 'ffi/gpio_native.dart';
 import 'gpio_pull_mode.dart';
 
-/// GPIO 핀을 나타내는 클래스
-/// 개별 GPIO 핀의 읽기/쓰기 동작을 담당
+/// GPIO 핀 제어 클래스
 class GpioPin {
-  /// GPIO 컨트롤러 참조 (순환 참조 방지를 위해 dynamic 사용)
+  /// GPIO 컨트롤러 참조
   final dynamic _gpio;
 
-  /// GPIO 핀 번호 (BCM 번호 체계)
+  /// 핀 번호 (BCM)
   final int pinNumber;
 
-  /// 핀의 현재 모드 (입력/출력)
+  /// 현재 모드
   GpioMode _mode;
 
-  /// 핀의 현재 값 (캐시)
+  /// 현재 값 (캐시)
   GpioValue _value;
 
-  /// 입력 모드일 때의 Pull 저항 모드 (입력 전용)
+  /// Pull 저항 모드
   GpioPullMode? _pullMode;
 
-  /// 핀이 초기화되었는지 여부
+  /// 초기화 여부
   bool _isInitialized = false;
 
-  /// libgpiod GPIO 라인 핸들
+  /// libgpiod 라인 핸들
   GpioLineNative? _nativeLine;
 
-  /// 이벤트 스트림 컨트롤러
+  /// 이벤트 스트림
   StreamController<GpioEdgeEvent>? _edgeController;
 
-  /// 이벤트 리스너가 활성화되었는지 여부
+  /// 이벤트 리스닝 활성 여부
   bool _isEventListening = false;
 
   /// PWM 타이머
   Timer? _pwmTimer;
 
-  /// PWM이 활성화되었는지 여부
+  /// PWM 활성 여부
   bool _isPwmActive = false;
 
   GpioPin(
@@ -54,7 +53,7 @@ class GpioPin {
     _validatePinNumber();
   }
 
-  /// 유효한 BCM GPIO 핀 번호 범위 (Raspberry Pi)
+  /// 유효한 BCM 핀 번호
   static const validPins = [
     2,
     3,
