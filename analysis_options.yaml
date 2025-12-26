@@ -1,0 +1,10 @@
+# flutter_gpio
+
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # 예제 파일에서는 print 사용 허용
+    avoid_print: false
+    # FFI 상수는 C 스타일 이름 허용
+    constant_identifier_names: false
